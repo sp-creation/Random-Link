@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Link Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx-populate/1.22.0/xlsx-populate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="table2excel.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #d3e0dc; /* Light green background */
+        }
+        h1 {
+            color: #552583; /* Purple heading color */
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #552583; /* Purple label color */
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4caf50; /* Green button color */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+        #generatedLinks {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #552583; /* Purple table header color */
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Random Link Generator</h1>
+
+    <!-- Input for the first half of the link -->
+    <label for="firstHalf">Enter the first half of the link:</label>
+    <input type="text" id="firstHalf" placeholder="https://example.com/">
+
+    <!-- Input for the number of random links to generate -->
+    <label for="numberOfLinks">Number of Random Links:</label>
+    <input type="number" id="numberOfLinks" value="1" min="1">
+
+    <button id="generateButton" onclick="generateRandomLinks()">Generate Random Links</button>
+
+    <button id="Export">Export Excel</button>
+    <div id="generatedLinks"></div>
+
+    <script>
+        function generateRandomLinks() {
+            // Get the value of the first half of the link from the input
+            const firstHalf = document.getElementById('firstHalf').value;
+
+            // Get the number of random links to generate
+            const numberOfLinks = parseInt(document.getElementById('numberOfLinks').value);
+
+            // Generate an array of random links with IDs
+            const randomLinks = Array.from({ length: numberOfLinks }, (_, index) => {
+                const uniqueString = generateRandomString(6); // Change 6 to the desired length
+                return { id: index + 1, link: `${firstHalf}${uniqueString}`, generatedId: uniqueString };
+            });
+
+            // Display the generated links in a table on the page
+            const tableHtml = `
+                <p>Your Random Links:</p>
+                <table id="generatedTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Link</th>
+                            <th>Generated ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${randomLinks.map(({ id, link, generatedId }) => `<tr><td>${id}</td><td>${link}</td><td>${generatedId}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('generatedLinks').innerHTML = tableHtml;
+        }
+
+        function generateRandomString(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        document.getElementById('Export').addEventListener('click', function() {
+            var table2excel = new Table2Excel();
+            table2excel.export(document.querySelectorAll('#generatedTable'), 'Generated Links');
+        });
+    </script>
+
+</body>
+</html>
